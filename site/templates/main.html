@@ -1,0 +1,84 @@
+<html>
+
+<head>
+<title>Рерайтинг текста ОНЛАЙН</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="css/bootstrap.min.css") }}">
+<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+<style>
+body {
+	background-color: #fbfbfb;
+	font-family: 'Montserrat', sans-serif;
+}
+.form-wrap {
+	color: gray;
+	width: 90%; 
+	height: 90%;
+	min-width: 600px;
+	min-height: 600px;
+	margin: 10px auto 50px auto;
+	background: #fff;
+	border-radius: 10px;
+	overflow: hidden;
+	padding: 50px 100px 25px 100px;
+	box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+	-moz-box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+	-o-box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+	-ms-box-shadow: 0 3px 20px 0px rgba(0, 0, 0, 0.1);
+}
+textarea {
+	width: 100%;
+	height: 100%;
+    background-color: #fbfbfb;
+	padding: 15px;
+	border-radius: 10px;
+	border: 2px #bbb solid;
+    resize: none;
+} 
+.center {
+  display: block;
+  margin: 20px auto;
+}
+.btn-center {
+	display: block;
+	margin: auto;
+	font-weight: bold;
+}
+.text-wrap {
+	height: 70%;
+	margin-bottom: 40px;
+	display: flex;
+	flex-flow: row wrap;
+}
+.textarea-wrap {
+	flex: 5;
+}
+.free-space {
+	flex: 1;
+}
+</style>
+</head>
+
+
+
+<body>
+<img class="center" height="100px" class="center" src="{{ url_for("static", filename="img/logo.png")}}"></img>
+<div class="form-wrap">
+	<div>
+	<form action="" method="post">
+		<div class="text-wrap">
+			<div class="textarea-wrap"><textarea name="input" placeholder="Скопируйте сюда текст" autofocus required>{{input|safe}}</textarea></div>
+			<div class="free-space"></div>
+			<div class="textarea-wrap"><textarea placeholder="Результат" readonly="readonly">{{output|safe}}</textarea><br><br></div>
+		</div>
+		<input type="submit" class="btn btn-warning btn-center" value="Сгенерировать" style>
+	</form>
+	<p>Это бесплатная онлайн-утилита, предназначеная для облегчения рерайтинга текста. Может использоваться для ааааааааа, ббббббббб и вввввввввв.</p>
+	</div>
+</div>
+<footer>
+
+</footer>
+</body>
+
+</html>
