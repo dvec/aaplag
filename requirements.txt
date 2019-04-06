@@ -1,2 +1,6 @@
 flask
 requests
+deeppavlov
+tensorflow>=1.12
+regex==2017.4.5
+gensim
