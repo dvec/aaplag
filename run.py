@@ -1,6 +1,7 @@
 import requests
 import json
 from flask import Flask, request, render_template
+from nn import transform_text
 
 app = Flask(__name__)
 tkey = "trnsl.1.1.20190406T120126Z.f880cac48e1e6bdb.ce1ea65ddd619cac01e53e80bead80c5edf56401"
@@ -16,6 +17,7 @@ def mainpage():
     if request.method == 'POST':
         input = request.form.get('input')
         output = translate_text(input, 'ru-en')
+        output = transform_text.transform(output)
         output = translate_text(output, 'en-ru')
         return render_template("main.html", input=input, output=output)
     else:
