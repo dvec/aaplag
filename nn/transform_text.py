@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 import regex as re
 import random
-
+import string
 
 import model
 import sample
