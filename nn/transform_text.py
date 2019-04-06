@@ -151,7 +151,7 @@ def interact_model(
 
 
 det = ReplaceableWordsDetector()
-def transform(text, return_mapping = False)
+def transform(text, return_mapping = False):
     result = det.get_replaceable_words(text.translate(str.maketrans('', '', string.punctuation)))
     result = interact_model(result[1], result[0])
 
