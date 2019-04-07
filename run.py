@@ -1,7 +1,8 @@
 import requests
 import json
 from flask import Flask, request, render_template
-from nn import transform_text
+from nn import gpt2_text_transform, download_gpt2_model
+
 
 app = Flask(__name__)
 tkey = "trnsl.1.1.20190406T120126Z.f880cac48e1e6bdb.ce1ea65ddd619cac01e53e80bead80c5edf56401"
@@ -17,7 +18,7 @@ def mainpage():
     if request.method == 'POST':
         input = request.form.get('input')
         output = translate_text(input, 'ru-en')
-        output = transform_text.transform(output)
+        output = gpt2_text_transform(output)
         output = translate_text(output, 'en-ru')
         return render_template("main.html", input=input, output=output)
     else:
@@ -25,4 +26,5 @@ def mainpage():
 
 
 if __name__ == '__main__':
+    download_gpt2_model()
     app.run(host='0.0.0.0', port=80)
