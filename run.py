@@ -1,8 +1,10 @@
+import sys
+
 import requests
 import json
 from flask import Flask, request, render_template
 from nn import gpt2_text_transform, download_gpt2_model
-
+from logging import basicConfig, DEBUG
 
 app = Flask(__name__)
 tkey = "trnsl.1.1.20190406T120126Z.f880cac48e1e6bdb.ce1ea65ddd619cac01e53e80bead80c5edf56401"
@@ -26,5 +28,6 @@ def mainpage():
 
 
 if __name__ == '__main__':
+    basicConfig(level=DEBUG, stream=sys.stderr)
     download_gpt2_model()
     app.run(host='0.0.0.0', port=80)
