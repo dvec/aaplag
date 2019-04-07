@@ -129,7 +129,7 @@ def interact_model(
                         generated += 1
                         text = enc.decode(out[i])
             generated_word = text.split()[-1]
-            old_new_words.append([words[ind], generated_word])
+            old_new_words.append([ind, words[ind], generated_word])
             words[ind] = generated_word
         print([words, old_new_words])
         return [words, old_new_words]
@@ -147,4 +147,28 @@ def transform(text, return_mapping=False):
     if return_mapping:
         return result
     else:
-        return result[0]
+        indexes = (x[0] for x in result)
+        new_words = (x[1] for x in result)
+
+        i = 0
+        new_text = ''
+        prev = ''
+        c = ',.-—:;!?'
+        for e in text + ' ':
+            if e == ' ':
+                if prev not in c:
+                    if i in indexes:
+                        new_text += next(new_words)
+                        i += 1
+                new_text += e
+            elif e in c:
+                if i in indexes:
+                    new_text += next(new_words)
+                i += 1
+                new_text += e
+            elif i not in indexes:
+                new_text += e
+            prev = e
+
+        return new_text[:-1]
+
