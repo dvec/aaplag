@@ -132,7 +132,7 @@ class interact_model:
 
         saver = tf.train.Saver()
         ckpt = tf.train.latest_checkpoint(os.path.join('models', self.model_name))
-        saver.restore(sess, ckpt)
+        saver.restore(self.sess, ckpt)
 
             # MAGIC STUFF OVER
 
