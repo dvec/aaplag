@@ -143,6 +143,7 @@ def transform(text, return_mapping=False):
     result = det.get_replaceable_words(text.translate(str.maketrans('', '', string.punctuation)))
     result, new_old_words = interact_model(result[1], result[0])
 
+    print(new_old_words)
     if return_mapping:
         return result, new_old_words
     else:
