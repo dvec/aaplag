@@ -169,6 +169,6 @@ def transform(text, return_mapping=False):
             elif i not in indexes:
                 new_text += e
             prev = e
+            print(e, new_text)
 
         return new_text[:-1]
-
