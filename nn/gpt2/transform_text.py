@@ -159,8 +159,8 @@ def transform(text, return_mapping=False):
                 if prev not in c:
                     if i in indexes:
                         new_text += next(new_words)
-                        i += 1
                 new_text += e
+                i += 1
             elif e in c:
                 if i in indexes:
                     new_text += next(new_words)
