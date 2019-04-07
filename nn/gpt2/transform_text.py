@@ -148,7 +148,7 @@ def transform(text, return_mapping=False):
         return result, new_old_words
     else:
         indexes = [x[0] for x in new_old_words]
-        new_words = (x[1] for x in new_old_words)
+        new_words = (x[2] for x in new_old_words)
         print(indexes, new_words)
 
         i = 0
