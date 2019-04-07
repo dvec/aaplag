@@ -151,7 +151,7 @@ class interact_model:
                     context_tokens = enc.encode(raw_text)
                     generated = 0
                     for _ in range(self.nsamples // self.batch_size):
-                        out = sess.run(output, feed_dict={
+                        out = self.sess.run(output, feed_dict={
                             context: [context_tokens for _ in range(self.batch_size)]
                         })
                         for i in range(self.batch_size):
