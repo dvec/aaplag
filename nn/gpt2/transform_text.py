@@ -90,15 +90,15 @@ def join_words(words, end):
 
 
 class interact_model:
-    self.ratio = 0.2
-    self.model_name = '117M'
-    self.seed = None
-    self.nsamples = 10
-    self.batch_size = None
-    self.length = 1
-    self.temperature = 1
-    self.top_k = 0
-    self.sess = tf.Session(graph=tf.Graph())
+    ratio = 0.2
+    model_name = '117M'
+    seed = None
+    nsamples = 10
+    batch_size = None
+    length = 1
+    temperature = 1
+    top_k = 0
+    sess = tf.Session(graph=tf.Graph())
 
     def __init__(self):
         # MAGIC STUFF BEGIN!
