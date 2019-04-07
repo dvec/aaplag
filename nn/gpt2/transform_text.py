@@ -89,107 +89,110 @@ def join_words(words, end):
     return ' '.join(words[0:end])
 
 
-def interact_model(
-        ratio=0.2,
-        model_name='117M',
-        seed=None,
-        nsamples=10,
-        batch_size=None,
-        length=1,
-        temperature=1,
-        top_k=0,
-):
-    # MAGIC STUFF BEGIN!
+class interact_model:
+    self.ratio = 0.2
+    self.model_name = '117M'
+    self.seed = None
+    self.nsamples = 10
+    self.batch_size = None
+    self.length = 1
+    self.temperature = 1
+    self.top_k = 0
+    self.sess = tf.Session(graph=tf.Graph())
 
-    if batch_size is None:
-        batch_size = 1
-    assert nsamples % batch_size == 0
-    np.random.seed(seed)
-    tf.set_random_seed(seed)
+    def __init__(self):
+        # MAGIC STUFF BEGIN!
 
-    enc = encoder.get_encoder(model_name)
-    hparams = model.default_hparams()
-    with open(os.path.join('models', model_name, 'hparams.json')) as f:
-        hparams.override_from_dict(json.load(f))
+        if self.batch_size is None:
+            self.batch_size = 1
+        assert self.nsamples % self.batch_size == 0
+        np.random.seed(self.seed)
+        tf.set_random_seed(self.seed)
 
-    if length is None:
-        length = hparams.n_ctx // 2
-    elif length > hparams.n_ctx:
-        raise ValueError(f"can't get samples longer than window size: {hparams.n_ctx}")
+        enc = encoder.get_encoder(self.model_name)
+        hparams = model.default_hparams()
+        with open(os.path.join('models', self.model_name, 'hparams.json')) as f:
+            hparams.override_from_dict(json.load(f))
 
-    sess = tf.Session(graph=tf.Graph())
-    
-    context = tf.placeholder(tf.int32, [batch_size, None])
-    output = sample.sample_sequence(
-        hparams=hparams, length=length,
-        context=context,
-        batch_size=batch_size,
-        temperature=temperature, top_k=top_k
-    )[:, 1:]
-
-    saver = tf.train.Saver()
-    ckpt = tf.train.latest_checkpoint(os.path.join('models', model_name))
-    saver.restore(sess, ckpt)
-
-    # MAGIC STUFF OVER
-
-    def generate(words, keyword_indicies):
-        old_new_words = []
-        words = words.copy()
-        loss = 0
-        for ind in range(len(words)):
-            if ind < 10:
-                continue
-            elif not isFitForReplacement(words[ind], ind, keyword_indicies) or random.random() > ratio:
-                continue
-            else:
-                raw_text = join_words(words, ind)
-                generated_words = []
-                context_tokens = enc.encode(raw_text)
-                generated = 0
-                for _ in range(nsamples // batch_size):
-                    out = sess.run(output, feed_dict={
-                        context: [context_tokens for _ in range(batch_size)]
-                    })
-                    for i in range(batch_size):
-                        generated += 1
-                        text = enc.decode(out[i])
-
-                    generated_word = text.split()[-1]
-                    generated_words.append(generated_word)
-
-            old_new_words.append([ind, words[ind], generated_words])
+        if self.length is None:
+            self.length = hparams.n_ctx // 2
+        elif self.length > hparams.n_ctx:
+            raise ValueError(f"can't get samples longer than window size: {hparams.n_ctx}")
 
 
-            #TODO WORD2VEC WORD SELECTION HERE!
-            closest, closest_ind = [1000, 0]
 
-            for candidates in generated_words:
-                try:
-                    cur_similarity = embeddings.similarity(words[ind], candidates)
-                    if cur_similarity > closest:
-                        closest = cur_similarity
-                        closest_ind = ind
-                except:
-                    print('Unknown word!')
-            loss += closest
-            words[ind] = generated_words[closest_ind]
-        try:
-            print('='*40 + 'similarity: ' + loss/len(old_new_words) + ' ' + '='*40)
-        except:
-            print('Not enough data for similarity!')
-        return [words, old_new_words]
-    return generate
+
+        context = tf.placeholder(tf.int32, [self.batch_size, None])
+        output = sample.sample_sequence(
+            hparams=hparams, length=self.length,
+            context=context,
+            batch_size=self.batch_size,
+            temperature=self.temperature, top_k=self.top_k
+        )[:, 1:]
+
+        saver = tf.train.Saver()
+        ckpt = tf.train.latest_checkpoint(os.path.join('models', self.model_name))
+        saver.restore(sess, ckpt)
+
+            # MAGIC STUFF OVER
+
+        def generate(words, keyword_indicies):
+            old_new_words = []
+            words = words.copy()
+            loss = 0
+            for ind in range(len(words)):
+                if ind < 10:
+                    continue
+                elif not isFitForReplacement(words[ind], ind, keyword_indicies) or random.random() > self.ratio:
+                    continue
+                else:
+                    raw_text = join_words(words, ind)
+                    generated_words = []
+                    context_tokens = enc.encode(raw_text)
+                    generated = 0
+                    for _ in range(self.nsamples // self.batch_size):
+                        out = sess.run(output, feed_dict={
+                            context: [context_tokens for _ in range(self.batch_size)]
+                        })
+                        for i in range(self.batch_size):
+                            generated += 1
+                            text = enc.decode(out[i])
+
+                        generated_word = text.split()[-1]
+                        generated_words.append(generated_word)
+
+                old_new_words.append([ind, words[ind], generated_words])
+
+
+                #TODO WORD2VEC WORD SELECTION HERE!
+                closest, closest_ind = [1000, 0]
+
+                for candidates in generated_words:
+                    try:
+                        cur_similarity = embeddings.similarity(words[ind], candidates)
+                        if cur_similarity > closest:
+                            closest = cur_similarity
+                            closest_ind = ind
+                    except:
+                        print('Unknown word!')
+                loss += closest
+                words[ind] = generated_words[closest_ind]
+            try:
+                print('='*40 + 'similarity: ' + loss/len(old_new_words) + ' ' + '='*40)
+            except:
+                print('Not enough data for similarity!')
+            return [words, old_new_words]
+
 
 
 logging.info('Building ReplaceableWordsDetector')
 det = ReplaceableWordsDetector()
-text_generator = interact_model()
+TextGenerator = interact_model()
 
 def transform(text, return_mapping=False):
     logging.info('Called transform with text "' + text + '"')
     result = det.get_replaceable_words(text.translate(str.maketrans('', '', string.punctuation)))
-    result, new_old_words = text_generator(result[1], result[0])
+    result, new_old_words = TextGenerator.generate(result[1], result[0])
 
     print(new_old_words)
     if return_mapping:
