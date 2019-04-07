@@ -149,6 +149,7 @@ def transform(text, return_mapping=False):
     else:
         indexes = (x[0] for x in new_old_words)
         new_words = (x[1] for x in new_old_words)
+        print(indexes, new_words)
 
         i = 0
         new_text = ''
@@ -159,8 +160,8 @@ def transform(text, return_mapping=False):
                 if prev not in c:
                     if i in indexes:
                         new_text += next(new_words)
+                    i += 1
                 new_text += e
-                i += 1
             elif e in c:
                 if i in indexes:
                     new_text += next(new_words)
