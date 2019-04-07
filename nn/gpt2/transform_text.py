@@ -171,9 +171,12 @@ def interact_model(
                             closest_ind = ind
                     except:
                         print('Unknown word!')
-                loss -= closest
+                loss += closest
                 words[ind] = generated_words[closest_ind]
-            print('='*40 + 'Loss: ' + loss/len(old_new_words) + ' ' + '='*40)
+            try:
+                print('='*40 + 'similarity: ' + loss/len(old_new_words) + ' ' + '='*40)
+            except:
+                print('Not enough data for similarity!')
             return [words, old_new_words]
     return generate
 
