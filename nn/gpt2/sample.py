@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-import nn.model as model
+import nn.gpt2.model as model
 
 
 def top_k_logits(logits, k):

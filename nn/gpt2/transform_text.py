@@ -7,9 +7,9 @@ import regex as re
 import random
 import string
 
-import nn.model as model
-import nn.sample as sample
-import nn.encoder as encoder
+import nn.gpt2.model as model
+import nn.gpt2.sample as sample
+import nn.gpt2.encoder as encoder
 
 from gensim.summarization import keywords
 
