@@ -142,13 +142,13 @@ det = ReplaceableWordsDetector()
 def transform(text, return_mapping=False):
     logging.info('Called transform with text "' + text + '"')
     result = det.get_replaceable_words(text.translate(str.maketrans('', '', string.punctuation)))
-    result = interact_model(result[1], result[0])
+    result, new_old_words = interact_model(result[1], result[0])
 
     if return_mapping:
-        return result
+        return result, new_old_words
     else:
-        indexes = (x[0] for x in result)
-        new_words = (x[1] for x in result)
+        indexes = (x[0] for x in new_old_words)
+        new_words = (x[1] for x in new_old_words)
 
         i = 0
         new_text = ''
