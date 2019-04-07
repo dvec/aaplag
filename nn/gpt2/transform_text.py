@@ -132,7 +132,7 @@ def interact_model(
 
         # MAGIC STUFF OVER
 
-        def generate(words, keyword_indicies)
+        def generate(words, keyword_indicies):
             old_new_words = []
             words = words.copy()
             loss = 0
