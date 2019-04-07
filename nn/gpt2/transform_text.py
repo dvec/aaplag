@@ -15,6 +15,7 @@ from gensim.summarization import keywords
 from gensim.test.utils import datapath, common_texts, get_tmpfile
 from gensim.models import Word2Vec, keyedvectors
 
+
 from deeppavlov import configs, build_model
 
 print('Embeddings are Loading.')
@@ -89,8 +90,6 @@ def join_words(words, end):
 
 
 def interact_model(
-        words,
-        keyword_indicies,
         ratio=0.2,
         model_name='117M',
         seed=None,
@@ -133,64 +132,68 @@ def interact_model(
 
         # MAGIC STUFF OVER
 
-        old_new_words = []
-        words = words.copy()
+        def generate(words, keyword_indicies)
+            old_new_words = []
+            words = words.copy()
+            loss = 0
+            for ind in range(len(words)):
+                if ind < 10:
+                    continue
+                elif not isFitForReplacement(words[ind], ind, keyword_indicies) or random.random() > ratio:
+                    continue
+                else:
+                    raw_text = join_words(words, ind)
+                    generated_words = []
+                    context_tokens = enc.encode(raw_text)
+                    generated = 0
+                    for _ in range(nsamples // batch_size):
+                        out = sess.run(output, feed_dict={
+                            context: [context_tokens for _ in range(batch_size)]
+                        })
+                        for i in range(batch_size):
+                            generated += 1
+                            text = enc.decode(out[i])
 
-        for ind in range(len(words)):
-            if ind < 10:
-                continue
-            elif not isFitForReplacement(words[ind], ind, keyword_indicies) or random.random() > ratio:
-                continue
-            else:
-                raw_text = join_words(words, ind)
-                generated_words = []
-                context_tokens = enc.encode(raw_text)
-                generated = 0
-                for _ in range(nsamples // batch_size):
-                    out = sess.run(output, feed_dict={
-                        context: [context_tokens for _ in range(batch_size)]
-                    })
-                    for i in range(batch_size):
-                        generated += 1
-                        text = enc.decode(out[i])
+                        generated_word = text.split()[-1]
+                        generated_words.append(generated_word)
 
-                    generated_word = text.split()[-1]
-                    generated_words.append(generated_word)
+                old_new_words.append([ind, words[ind], generated_words])
 
-            old_new_words.append([ind, words[ind], generated_words])
-            # TODO WORD2VEC WORD SELECTION HERE!
-            closest, closest_ind = [1000, 0]
 
-            for candidates in generated_words:
-                try:
-                    cur_similarity = embeddings.similarity(words[ind], candidates)
-                    if cur_similarity > closest:
-                        closest = cur_similarity
-                        closest_ind = ind
-                except:
-                    print('Unknown word!')
+                #TODO WORD2VEC WORD SELECTION HERE!
+                closest, closest_ind = [1000, 0]
 
-            words[ind] = generated_words[closest_ind]
-
-        return [words, old_new_words]
+                for candidates in generated_words:
+                    try:
+                        cur_similarity = embeddings.similarity(words[ind], candidates)
+                        if cur_similarity > closest:
+                            closest = cur_similarity
+                            closest_ind = ind
+                    except:
+                        print('Unknown word!')
+                loss -= closest
+                words[ind] = generated_words[closest_ind]
+            print('='*40 + 'Loss: ' + loss/len(old_new_words) + ' ' + '='*40)
+            return [words, old_new_words]
+    return generate
 
 
 logging.info('Building ReplaceableWordsDetector')
 det = ReplaceableWordsDetector()
-
+text_generator = interact_model()
 
 def transform(text, return_mapping=False):
     logging.info('Called transform with text "' + text + '"')
     result = det.get_replaceable_words(text.translate(str.maketrans('', '', string.punctuation)))
-    result, new_old_words = interact_model(result[1], result[0])
+    result, new_old_words = text_generator(result[1], result[0])
 
     print(new_old_words)
     if return_mapping:
         return result, new_old_words
     else:
         indexes = [x[0] for x in new_old_words]
-        new_words = iter(result)
-        # print(indexes, new_words)
+        new_words = (x[2] for x in new_old_words)
+        #print(indexes, new_words)
 
         i = 0
         new_text = ''
@@ -211,6 +214,6 @@ def transform(text, return_mapping=False):
             elif i not in indexes:
                 new_text += e
             prev = e
-            # print(e, i, new_text)
+            #print(e, i, new_text)
 
         return new_text[:-1]
