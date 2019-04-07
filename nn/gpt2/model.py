@@ -191,10 +191,6 @@ def model(hparams, X, past=None, scope='model', reuse=False):
 
 
 def download_model():
-    if len(sys.argv) != 2:
-        print('You must enter the model name as a parameter, e.g.: download_model.py 117M')
-        sys.exit(1)
-
     subdir = 'models/117M'
     if not os.path.exists(subdir):
         os.makedirs(subdir)
