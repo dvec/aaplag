@@ -31,7 +31,11 @@ class ReplaceableWordsDetector:
 
     def __init__(self):
         # NER model initner_rus
-        self.ner_model = build_model(configs.ner.ner_ontonotes, download=True)
+        if os.path.exists('/root/.deeppavlov/models'):
+            self.ner_model = build_model(configs.ner.ner_ontonotes, download=False)
+        else:
+            self.ner_model = build_model(configs.ner.ner_ontonotes, download=True)
+
 
     def get_stopwords_keywords_indicies(self, keywords, text):
         stopwords_keywords_indicies = []
