@@ -6,18 +6,19 @@ import os
 import numpy as np
 import tensorflow as tf
 
-import model
-import sample
-import encoder
+import nn.model as model
+import nn.sample as sample
+import nn.encoder as encoder
+
 
 def interact_model(
-    model_name='117M',
-    seed=None,
-    nsamples=1,
-    batch_size=None,
-    length=None,
-    temperature=1,
-    top_k=0,
+        model_name='117M',
+        seed=None,
+        nsamples=1,
+        batch_size=None,
+        length=None,
+        temperature=1,
+        top_k=0,
 ):
     if batch_size is None:
         batch_size = 1
@@ -63,6 +64,6 @@ def interact_model(
                     print(f"{text}")
             print("=" * 80)
 
+
 if __name__ == '__main__':
     fire.Fire(interact_model)
-

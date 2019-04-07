@@ -6,18 +6,19 @@ import os
 import numpy as np
 import tensorflow as tf
 
-import model
-import sample
-import encoder
+import nn.model as model
+import nn.sample as sample
+import nn.encoder as encoder
+
 
 def sample_model(
-    model_name='117M',
-    seed=None,
-    nsamples=0,
-    batch_size=1,
-    length=None,
-    temperature=1,
-    top_k=0,
+        model_name='117M',
+        seed=None,
+        nsamples=0,
+        batch_size=1,
+        length=None,
+        temperature=1,
+        top_k=0,
 ):
     np.random.seed(seed)
     tf.set_random_seed(seed)
@@ -53,6 +54,6 @@ def sample_model(
                 print("=" * 40 + " SAMPLE " + str(generated) + " " + "=" * 40)
                 print(f"{text}")
 
+
 if __name__ == '__main__':
     fire.Fire(sample_model)
-
