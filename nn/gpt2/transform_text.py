@@ -15,7 +15,6 @@ from gensim.summarization import keywords
 from gensim.test.utils import datapath, common_texts, get_tmpfile
 from gensim.models import Word2Vec, keyedvectors
 
-
 from deeppavlov import configs, build_model
 
 print('Embeddings are Loading.')
@@ -154,30 +153,25 @@ def interact_model(
                     for i in range(batch_size):
                         generated += 1
                         text = enc.decode(out[i])
-            
+
                     generated_word = text.split()[-1]
                     generated_words.append(generated_word)
-            print('-'*80 + '\n'+ str(word) + '\n'  + generated_words +'\n' + '-'*80)
+
             old_new_words.append([ind, words[ind], generated_words])
-            
-    
-            #TODO WORD2VEC WORD SELECTION HERE!
+            # TODO WORD2VEC WORD SELECTION HERE!
             closest, closest_ind = [1000, 0]
-            
+
             for candidates in generated_words:
                 try:
-                    cur_similarity = embeddings.similarity(words[ind], candidates) 
+                    cur_similarity = embeddings.similarity(words[ind], candidates)
                     if cur_similarity > closest:
                         closest = cur_similarity
                         closest_ind = ind
                 except:
                     print('Unknown word!')
-                
-
-            
 
             words[ind] = generated_words[closest_ind]
-    
+
         return [words, old_new_words]
 
 
@@ -195,8 +189,8 @@ def transform(text, return_mapping=False):
         return result, new_old_words
     else:
         indexes = [x[0] for x in new_old_words]
-        new_words = (x[2] for x in new_old_words)
-        #print(indexes, new_words)
+        new_words = iter(result)
+        # print(indexes, new_words)
 
         i = 0
         new_text = ''
@@ -217,6 +211,6 @@ def transform(text, return_mapping=False):
             elif i not in indexes:
                 new_text += e
             prev = e
-            #print(e, i, new_text)
+            # print(e, i, new_text)
 
         return new_text[:-1]
