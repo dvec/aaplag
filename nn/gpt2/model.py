@@ -192,8 +192,9 @@ def model(hparams, X, past=None, scope='model', reuse=False):
 
 def download_model():
     subdir = 'models/117M'
-    if not os.path.exists(subdir):
-        os.makedirs(subdir)
+    if os.path.exists(subdir):
+        return
+    os.makedirs(subdir)
     subdir = subdir.replace('\\', '/')  # needed for Windows
 
     for filename in ['checkpoint', 'encoder.json', 'hparams.json', 'model.ckpt.data-00000-of-00001', 'model.ckpt.index',

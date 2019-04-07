@@ -45,8 +45,11 @@ class ReplaceableWordsDetector:
         '''
         result = self.ner_model([text])
         indicies_ner = [ind for ind, val in enumerate(result[1][0]) if val != 'O']
-        indicies_keywords = self.get_keywords_indicies(keywords(text, split=True), result[0][0])
-
+        try:
+            indicies_keywords = self.get_keywords_indicies(keywords(text, split=True), result[0][0])
+        except Exception as e:
+            print(e)
+            return [indicies_ner, result[0][0]]
         replaceable_words_indicies = list(set().union(indicies_ner, indicies_keywords))
         return [replaceable_words_indicies, result[0][0]]
 
