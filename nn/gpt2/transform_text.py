@@ -12,8 +12,15 @@ import nn.gpt2.sample as sample
 import nn.gpt2.encoder as encoder
 
 from gensim.summarization import keywords
+from gensim.test.utils import datapath, common_texts, get_tmpfile
+from gensim.models import Word2Vec, keyedvectors
+
 
 from deeppavlov import configs, build_model
+
+print('Embeddings are Loading.')
+embeddings = keyedvectors.KeyedVectors.load_word2vec_format("wikipedia.6B.100d.model", binary=True)
+print('Embeddings are ready.')
 
 
 class ReplaceableWordsDetector:
@@ -74,7 +81,7 @@ def interact_model(
         ratio=0.2,
         model_name='117M',
         seed=None,
-        nsamples=1,
+        nsamples=10,
         batch_size=None,
         length=1,
         temperature=1,
@@ -123,7 +130,7 @@ def interact_model(
                 continue
             else:
                 raw_text = join_words(words, ind)
-                # print(raw_text)
+                generated_words = []
                 context_tokens = enc.encode(raw_text)
                 generated = 0
                 for _ in range(nsamples // batch_size):
@@ -133,9 +140,30 @@ def interact_model(
                     for i in range(batch_size):
                         generated += 1
                         text = enc.decode(out[i])
-            generated_word = text.split()[-1]
-            old_new_words.append([ind, words[ind], generated_word])
-            words[ind] = generated_word
+            
+                    generated_word = text.split()[-1]
+                    generated_words.append(generated_word)
+            print('-'*80 + '\n'+ str(word) + '\n'  + generated_words +'\n' + '-'*80)
+            old_new_words.append([ind, words[ind], generated_words])
+            
+    
+            #TODO WORD2VEC WORD SELECTION HERE!
+            closest, closest_ind = [1000, 0]
+            
+            for candidates in generated_words:
+                try:
+                    cur_similarity = embeddings.similarity(words[ind], candidates) 
+                    if cur_similarity > closest:
+                        closest = cur_similarity
+                        closest_ind = ind
+                except:
+                    print('Unknown word!')
+                
+
+            
+
+            words[ind] = generated_words[closest_ind]
+    
         return [words, old_new_words]
 
 
@@ -154,7 +182,7 @@ def transform(text, return_mapping=False):
     else:
         indexes = [x[0] for x in new_old_words]
         new_words = (x[2] for x in new_old_words)
-        print(indexes, new_words)
+        #print(indexes, new_words)
 
         i = 0
         new_text = ''
@@ -175,6 +203,6 @@ def transform(text, return_mapping=False):
             elif i not in indexes:
                 new_text += e
             prev = e
-            print(e, i, new_text)
+            #print(e, i, new_text)
 
         return new_text[:-1]
