@@ -131,7 +131,6 @@ def interact_model(
             generated_word = text.split()[-1]
             old_new_words.append([ind, words[ind], generated_word])
             words[ind] = generated_word
-        print([words, old_new_words])
         return [words, old_new_words]
 
 

@@ -20,8 +20,11 @@ def mainpage():
     if request.method == 'POST':
         input = request.form.get('input')
         output = translate_text(input, 'ru-en')
+        print(output)
         output = gpt2_text_transform(output)
+        print(output)
         output = translate_text(output, 'en-ru')
+        print(output)
         return render_template("main.html", input=input, output=output)
     else:
         return render_template("main.html")
